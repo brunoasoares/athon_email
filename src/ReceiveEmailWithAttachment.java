@@ -12,25 +12,30 @@ public class ReceiveEmailWithAttachment {
 
     private static String saveDirectory;
 
-    public static void receiveEmail(String pop3Host, String mailStoreType, String userName, String password) {
+    private static void receiveEmail(String imapHost, String mailStoreType, String userName, String password) {
         //Set properties
         Properties props = new Properties();
-        props.put("mail.store.protocol", "pop3");
-        props.put("mail.pop3.host", pop3Host);
-        props.put("mail.pop3.port", "995");
-        props.put("mail.pop3.starttls.enable", "true");
+        props.put("mail.store.protocol", "imap");
+        props.put("mail.imap.host", imapHost);
+        props.put("mail.imap.port", "993");
+        props.put("mail.imap.starttls.enable", "true");
 
         // Get the Session object.
         Session session = Session.getInstance(props);
 
         try {
-            //Create the POP3 store object and connect to the pop store.
-            Store store = session.getStore("pop3s");
-            store.connect(pop3Host, userName, password);
+            //Create the IMAP store object and connect to the pop store.
+            Store store = session.getStore("imaps");
+            store.connect(imapHost, userName, password);
 
             //Create the folder object and open it in your mailbox.
             Folder emailFolder = store.getDefaultFolder();
-            emailFolder = emailFolder.getFolder("ASG_NFE");
+            for (Folder T:emailFolder.list()){
+                for (Folder S:T.list()){
+                    System.out.println(S.getName());
+                }
+            }
+            emailFolder = emailFolder.getFolder("INBOX/ASG_NFE");
             emailFolder.open(Folder.READ_ONLY);
 
             //Retrieve the messages from the folder object.
@@ -78,7 +83,7 @@ public class ReceiveEmailWithAttachment {
                                 part.saveFile(saveDirectory + File.separator + fileName);
                             }
                         } else {
-                            messageContent = part.getContent().toString();
+                            //messageContent = part.getContent().toString();
                         }
                     }
 
@@ -100,16 +105,16 @@ public class ReceiveEmailWithAttachment {
     }
 
     public static void main(String[] args) {
-        String pop3Host = "pop.gmail.com"; //change accordingly
+        String imapHost = "imap.gmail.com"; //change accordingly
         String mailStoreType = "pop3";
         final String userName = "athon@athonengenharia.com"; //change accordingly
         final String password = "karenbrunos2";//change accordingly
         setSaveDirectory("/Users/brunoandrade/Dropbox/Athon/Emails_NFe");
         // call receiveEmail
-        receiveEmail(pop3Host, mailStoreType, userName, password);
+        receiveEmail(imapHost, mailStoreType, userName, password);
     }
 
-    public static void setSaveDirectory(String dir) {
+    private static void setSaveDirectory(String dir) {
         saveDirectory = dir;
     }
 }
